@@ -6,10 +6,18 @@ from cargo_app.models import Status, TrackCode
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ['name_status', 'description_status', 'track_code']
+        fields = '__all__'
 
 
 class TrackCodeSerializer(serializers.ModelSerializer):
     class Meta:
         model = TrackCode
         fields = '__all__'
+
+
+class CheckTrackCodeSerializer(serializers.ModelSerializer):
+    code = StatusSerializer(many=False)
+
+    class Meta:
+        model = TrackCode
+        fields = ['code', 'status']
