@@ -19,5 +19,4 @@ COPY . /app/
 RUN pip install django-cors-headers
 RUN python manage.py migrate
 
-# Команда для запуска Django-сервера
-CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
+CMD ["python", "manage.py", "runserver"]

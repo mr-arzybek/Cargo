@@ -2,13 +2,11 @@ version: '3'
 
 services:
   backend:
-    build: .  # Используется Dockerfile в текущем каталоге
+    build: .
     ports:
-      - "80:80"  # Проброс портов, доступ к Django-приложению на порту 8000
+      - "80:80"
     volumes:
-      - .:/app  # Монтирование текущего каталога в контейнер
+      - .:/app
     environment:
-      - DEBUG=True  # Переменная окружения для включения отладочного режима
-    command: sh -c "python manage.py migrate && python manage.py runserver"  # Команда для миграции и запуска сервера
-
-  # Если проект использует SQLite3, нет необходимости в отдельной службе для базы данных
+      - DEBUG=True
+    command: sh -c "python manage.py migrate && python manage.py runserver 0.0.0.0:80"  # Команда для миграции и запуска сервера
