@@ -17,6 +17,12 @@ COPY . /app/
 
 # Устанавливаем django-cors-headers
 RUN pip install django-cors-headers
+
+# Устанавливаем DJANGO_SETTINGS_MODULE
+ENV DJANGO_SETTINGS_MODULE=core.settings.base
+
+# Выполняем миграции Django
 RUN python manage.py migrate
 
-CMD ["python", "manage.py", "runserver"]
+# Запускаем сервер Django
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

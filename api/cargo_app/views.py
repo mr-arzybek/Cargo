@@ -51,6 +51,7 @@ class StatusUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
 
 
 class StatusList(generics.ListCreateAPIView):
+    permission_classes = [permissions.IsAdminUser]
     queryset = Status.objects.all()
     serializer_class = serializers.StatusSerializer
 
