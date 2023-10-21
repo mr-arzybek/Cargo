@@ -1,28 +1,31 @@
-# Используем официальный образ Python 3.10
+# Use the official Python 3.10 image as the base image
 FROM python:3.10
 
-# Устанавливаем переменные окружения
-ENV PYTHONWRITEBYTECODE 1
-ENV PYTHONBUFFERED 1
+# Set environment variables to control Python's behavior
+ENV PYTHONUNBUFFERED 1
+ENV PYTHONDONTWRITEBYTECODE 1
 
-# Устанавливаем рабочий каталог внутри контейнера
+# Create and set the working directory inside the container
 WORKDIR /app
 
-# Копируем requirements.txt и устанавливаем зависимости
+# Copy the requirements file into the container and install dependencies
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
-# Копируем остальное приложение
+# Copy the rest of your application code into the container
 COPY . /app/
 
-# Устанавливаем django-cors-headers
-RUN pip install django-cors-headers
+# Install any additional dependencies if needed
+# RUN pip install some-package
 
-# Устанавливаем DJANGO_SETTINGS_MODULE
+# Set the DJANGO_SETTINGS_MODULE environment variable
 ENV DJANGO_SETTINGS_MODULE=core.settings.base
 
-# Выполняем миграции Django
+# Run database migrations
 RUN python manage.py migrate
 
-# Запускаем сервер Django
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Expose the port on which your application will run (change it if necessary)
+EXPOSE 8000
+
+# Start the application
+CMD ["python", "manage.py", "runserver"]
