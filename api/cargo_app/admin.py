@@ -3,7 +3,7 @@ from .models import TrackCode, Status
 
 
 class TrackCodeAdmin(admin.ModelAdmin):
-    list_display = ('code', 'status')
+    list_display = ('track_code', 'status')
     list_filter = ('status',)
     search_fields = ('code',)
     list_per_page = 15

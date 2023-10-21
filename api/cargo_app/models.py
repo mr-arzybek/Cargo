@@ -13,16 +13,18 @@ class Status(models.Model):
 
 
 class TrackCode(models.Model):
-    code = models.CharField(max_length=300, unique=True, default='', verbose_name='Код для отслеживания статуса заказа',
+    track_code = models.CharField(max_length=300, unique=True, default='', verbose_name='Код для отслеживания статуса заказа',
                             db_index=True)
     created = models.DateTimeField(auto_now_add=True)
     status = models.ForeignKey(Status, on_delete=models.CASCADE, default='', verbose_name='статус')
-    date = models.DateTimeField(verbose_name='Время', )
+    date = models.DateField(verbose_name='Время')
+
+    def format_date(self, obj):
+        return obj.my_date_field.strftime('%Y-%m-%d')
 
     def __str__(self):
-        return f'Трек код :{self.code[:5]} Дата создание и время создания кода {self.created}'
+        return f'Трек код :{self.track_code[:5]} Дата создание и время создания кода {self.created}'
 
     class Meta:
         verbose_name = 'Трек Код'
         verbose_name_plural = 'Трек Коды'
-

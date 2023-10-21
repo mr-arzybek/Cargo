@@ -1,23 +1,20 @@
-from django.contrib.auth import logout
+from rest_framework.permissions import AllowAny
+from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
 
-from rest_framework import generics, mixins, viewsets
-from rest_framework.decorators import action
+from .serializers import LoginSerializer
+from .email import EmailAuthentication
+from rest_framework import generics
 from rest_framework.views import APIView
-from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status, response
-from rest_framework.permissions import IsAuthenticated
-
-from .models import User
 from .serializers import (
     PasswordResetSearchUserSerializer, PasswordResetCodeSerializer, PasswordResetNewPasswordSerializer)
-
-
 from .service import ResetPasswordSendEmail, PasswordResetCode, PasswordResetNewPassword
+
 
 class PasswordResetRequestAPIView(generics.CreateAPIView):
     serializer_class = PasswordResetSearchUserSerializer
-
 
     def post(self, request, *args, **kwargs):
         reset_password_service = ResetPasswordSendEmail()
@@ -26,7 +23,6 @@ class PasswordResetRequestAPIView(generics.CreateAPIView):
 
 class PasswordResetCodeAPIView(generics.CreateAPIView):
     serializer_class = PasswordResetCodeSerializer
-
 
     def post(self, request, *args, **kwargs):
         reset_password_code = PasswordResetCode()
@@ -48,3 +44,26 @@ class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
                 return response.Response(data={"detail": message}, status=status.HTTP_400_BAD_REQUEST)
         else:
             return response.Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class LoginView(APIView):
+    authentication_classes = [EmailAuthentication]
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        serializer = LoginSerializer(data=request.data)
+
+        if serializer.is_valid():
+            email = serializer.validated_data['email']
+            user = self.request.user
+
+            if user:
+                refresh = RefreshToken.for_user(user)
+                access_token = str(refresh.access_token)
+                refresh_token = str(refresh)
+
+                return Response({'access_token': access_token, 'refresh_token': refresh_token}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

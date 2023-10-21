@@ -25,7 +25,7 @@ class UserCustomManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    password = models.CharField(max_length=20)
+    password = models.CharField(max_length=150)
     email = models.EmailField(unique=True)
     is_superuser = models.BooleanField(default=False)
     is_active = models.BooleanField(default=True)

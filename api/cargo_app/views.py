@@ -1,3 +1,4 @@
+from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework import permissions
 from rest_framework.response import Response
@@ -10,11 +11,14 @@ from api.cargo_app.models import TrackCode, Status
 from api.cargo_app.serializers import TrackCodeSerializer
 
 
+from .filters import TrackCodeFilter
+
 class TrackCodeList(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = TrackCodeSerializer
-    queryset = models.TrackCode.objects.all()
-
+    queryset = TrackCode.objects.all()
+    filter_backends = [DjangoFilterBackend]
+    filterset_class = TrackCodeFilter
 
 class TrackCodeCreate(generics.CreateAPIView):
     permission_classes = [permissions.IsAdminUser]
@@ -43,13 +47,6 @@ class TrackCodeDelete(generics.DestroyAPIView, generics.RetrieveAPIView):
     lookup_field = 'id'
 
 
-class StatusUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
-    permission_classes = [permissions.IsAdminUser]
-    serializer_class = serializers.StatusSerializer
-    queryset = models.Status.objects.all()
-    lookup_field = 'id'
-
-
 class StatusList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAdminUser]
     queryset = Status.objects.all()
@@ -64,28 +61,29 @@ class StatusDelete(generics.DestroyAPIView, generics.RetrieveAPIView):
 
 
 class CheckTrackCodeView(APIView):
+    permission_classes = [permissions.IsAuthenticated,]
     def get(self, request):
-        code = request.query_params.get('code', None)
+        track_code = request.get('track_code', None)
 
-        if code is None:
+        if track_code is None:
             return Response({'error': 'Пожалуйста, предоставьте код'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            track_code = TrackCode.objects.get(code=code)
+            track_code = TrackCode.objects.get(track_code=track_code)
             status_tr = str(track_code.status)
             return Response({'status': status_tr}, status=status.HTTP_200_OK)
         except TrackCode.DoesNotExist:
             return Response({'error': 'Код не найден'}, status=status.HTTP_404_NOT_FOUND)
 
     def post(self, request):
-        code = request.data.get('code', None)
+        track_code = request.data.get('track_code', None)
 
-        if code is None:
+        if track_code is None:
             return Response({'error': 'Пожалуйста, предоставьте код'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            track_code = TrackCode.objects.get(code=code)
-            status_tr = str(track_code.status)  # Преобразование статуса в строку
+            track_code = TrackCode.objects.get(track_code=track_code)
+            status_tr = str(track_code.status)
             return Response({'status': status_tr}, status=HTTP_200_OK)
         except TrackCode.DoesNotExist:
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)

@@ -16,3 +16,8 @@ class PasswordResetSearchUserSerializer(serializers.Serializer):
 
     class Meta:
         fields = ['email']
+
+
+class LoginSerializer(serializers.Serializer):
+    email = serializers.EmailField()
+    password = serializers.CharField(write_only=True)

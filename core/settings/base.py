@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/4.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/4.2/ref/settings/
 """
-
+import datetime
 from pathlib import Path
 from .jazzmin import *
 
@@ -50,6 +50,7 @@ LIBRUARY_APPS = [
     'corsheaders',
     'drf_yasg',
     'djoser',
+    'django_filters'
 
 ]
 
@@ -96,6 +97,7 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
     ),
 }
 
@@ -107,13 +109,19 @@ EMAIL_PORT = 587
 
 AUTH_USER_MODEL = 'users.User'
 
-
 DJOSER = {
     'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
     'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
     'ACTIVATION_URL': '#/activate/{uid}/{token}',
     'SEND_ACTIVATION_EMAIL': True,
     'SERIALIZERS': {},
+}
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': datetime.timedelta(seconds=3600),  # 24 часа
+    'SLIDING_TOKEN_REFRESH_LIFETIME': datetime.timedelta(days=1),  # 7 дней
+    'SLIDING_TOKEN_LIFETIME': datetime.timedelta(days=14),  # 14 дней
+    'ROTATE_REFRESH_TOKENS': True,
 }
 AUTH_PASSWORD_VALIDATORS = [
     {
