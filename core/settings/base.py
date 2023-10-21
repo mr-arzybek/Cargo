@@ -49,6 +49,7 @@ LIBRUARY_APPS = [
     'rest_framework_simplejwt',
     'corsheaders',
     'drf_yasg',
+    'djoser',
 
 ]
 
@@ -96,6 +97,23 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
+}
+
+EMAIL_USE_TLS = True
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_HOST_USER = 'dreeemanndreemann@gmail.com'
+EMAIL_HOST_PASSWORD = 'jhwd uljw cbah dlgj'
+EMAIL_PORT = 587
+
+AUTH_USER_MODEL = 'users.User'
+
+
+DJOSER = {
+    'PASSWORD_RESET_CONFIRM_URL': '#/password/reset/confirm/{uid}/{token}',
+    'USERNAME_RESET_CONFIRM_URL': '#/username/reset/confirm/{uid}/{token}',
+    'ACTIVATION_URL': '#/activate/{uid}/{token}',
+    'SEND_ACTIVATION_EMAIL': True,
+    'SERIALIZERS': {},
 }
 AUTH_PASSWORD_VALIDATORS = [
     {
