@@ -63,7 +63,6 @@ class StatusDelete(generics.DestroyAPIView, generics.RetrieveAPIView):
 
 
 class CheckTrackCodeView(APIView):
-    permission_classes = [permissions.IsAuthenticated,]
     def get(self, request):
         track_code = request.get('track_code', None)
 
