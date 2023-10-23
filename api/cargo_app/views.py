@@ -72,7 +72,8 @@ class CheckTrackCodeView(APIView):
         try:
             track_code = TrackCode.objects.get(track_code=track_code)
             status_tr = str(track_code.status)
-            return Response({'status': status_tr}, status=status.HTTP_200_OK)
+            date_tr = str(track_code.date)
+            return Response({'status': status_tr, 'date': date_tr}, status=status.HTTP_200_OK)
         except TrackCode.DoesNotExist:
             return Response({'error': 'Код не найден'}, status=status.HTTP_404_NOT_FOUND)
 
