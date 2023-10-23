@@ -14,10 +14,3 @@ class TrackCodeSerializer(serializers.ModelSerializer):
         model = TrackCode
         fields = '__all__'
 
-
-class CheckTrackCodeSerializer(serializers.ModelSerializer):
-    status = StatusSerializer(many=False)
-
-    class Meta:
-        model = TrackCode
-        fields = ['name_status', ]
