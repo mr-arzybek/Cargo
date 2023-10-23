@@ -11,8 +11,8 @@ from api.cargo_app import models
 from api.cargo_app.models import TrackCode, Status
 from api.cargo_app.serializers import TrackCodeSerializer
 
-
 from .filters import TrackCodeFilter
+
 
 class TrackCodeList(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
@@ -21,6 +21,7 @@ class TrackCodeList(generics.ListAPIView):
     filter_backends = [DjangoFilterBackend, SearchFilter]
     filterset_class = TrackCodeFilter
     search_fields = ['track_code']
+
 
 class TrackCodeCreate(generics.CreateAPIView):
     permission_classes = [permissions.IsAdminUser]
@@ -63,20 +64,6 @@ class StatusDelete(generics.DestroyAPIView, generics.RetrieveAPIView):
 
 
 class CheckTrackCodeView(APIView):
-    def get(self, request):
-        track_code = request.get('track_code', None)
-
-        if track_code is None:
-            return Response({'error': 'Пожалуйста, предоставьте код'}, status=status.HTTP_400_BAD_REQUEST)
-
-        try:
-            track_code = TrackCode.objects.get(track_code=track_code)
-            status_tr = str(track_code.status)
-            date_tr = str(track_code.date)
-            return Response({'status': status_tr, 'date': date_tr}, status=status.HTTP_200_OK)
-        except TrackCode.DoesNotExist:
-            return Response({'error': 'Код не найден'}, status=status.HTTP_404_NOT_FOUND)
-
     def post(self, request):
         track_code = request.data.get('track_code', None)
 
@@ -85,7 +72,8 @@ class CheckTrackCodeView(APIView):
 
         try:
             track_code = TrackCode.objects.get(track_code=track_code)
-            status_tr = str(track_code.status)
-            return Response({'status': status_tr}, status=HTTP_200_OK)
+            status_tr = str(track_code.status.name_status)
+            date_tr = str(track_code.date)
+            return Response({'status': status_tr, 'date': date_tr}, status=HTTP_200_OK)
         except TrackCode.DoesNotExist:
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
