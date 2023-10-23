@@ -1,3 +1,4 @@
+from django.contrib.auth import authenticate
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
 from rest_framework_simplejwt.tokens import RefreshToken
@@ -31,7 +32,6 @@ class PasswordResetCodeAPIView(generics.CreateAPIView):
 
 class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
     serializer_class = PasswordResetNewPasswordSerializer
-
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -50,20 +50,14 @@ class LoginView(APIView):
     authentication_classes = [EmailAuthentication]
     permission_classes = [AllowAny]
 
-    def post(self, request):
+    def post(self, request, *args, **kwargs):
         serializer = LoginSerializer(data=request.data)
-
         if serializer.is_valid():
-            email = serializer.validated_data['email']
-            user = self.request.user
-
-            if user:
-                refresh = RefreshToken.for_user(user)
-                access_token = str(refresh.access_token)
-                refresh_token = str(refresh)
-
-                return Response({'access': access_token, 'refresh': refresh_token}, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'Invalid credentials'}, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            username = serializer.validated_data["email"]
+            password = serializer.validated_data["password"]
+            user = authenticate(username=username, password=password)
+            if user is not None:
+                token = RefreshToken.for_user(user)
+                access_token = token.access_token
+                return Response({"access": str(token) ,'refresh': str(access_token)}, status=status.HTTP_200_OK)
+            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
