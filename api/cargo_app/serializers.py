@@ -10,7 +10,12 @@ class StatusSerializer(serializers.ModelSerializer):
 
 
 class TrackCodeSerializer(serializers.ModelSerializer):
+    status = serializers.SerializerMethodField()
+
+
     class Meta:
         model = TrackCode
         fields = '__all__'
 
+    def get_status(self, obj):
+        return obj.status.name_status
