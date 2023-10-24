@@ -9,13 +9,28 @@ class StatusSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
-class TrackCodeSerializer(serializers.ModelSerializer):
-    status = serializers.SerializerMethodField()
+class StatusForTrackCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Status
+        fields = 'name_status'
 
+
+class TrackCodeSerializer(serializers.ModelSerializer):
+    status_id = serializers.IntegerField(write_only=True, required=True)
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = TrackCode
         fields = '__all__'
 
+    def create(self, validated_data):
+        status_id = validated_data.pop('status_id')
+        status = Status.objects.get(id=status_id)
+        track_code = validated_data['track_code']
+        date = validated_data['date']
+        track_code_instance = TrackCode.objects.create(track_code=track_code, status=status, date=date)
+        return track_code_instance
+
     def get_status(self, obj):
-        return obj.status.name_status
+        return f"{obj.status.name_status}"
+

@@ -2,7 +2,7 @@ from django.db import models
 
 
 class Status(models.Model):
-    name_status = models.CharField(max_length=200, unique=True, db_index=True)
+    name_status = models.CharField(max_length=200, unique=True)
 
     def __str__(self):
         return f'{self.name_status} {self.pk}'
@@ -13,18 +13,19 @@ class Status(models.Model):
 
 
 class TrackCode(models.Model):
-    track_code = models.CharField(max_length=300, unique=True, default='', verbose_name='Код для отслеживания статуса заказа',
-                            db_index=True)
-    created = models.DateTimeField(auto_now_add=True)
-    status = models.ForeignKey(Status, on_delete=models.CASCADE, default='', verbose_name='статус')
-    date = models.DateField(verbose_name='Время')
-
-    def format_date(self, obj):
-        return obj.my_date_field.strftime('%Y-%m-%d')
+    track_code = models.CharField(max_length=200, unique=True)
+    status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
+    date = models.DateField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f'Трек код :{self.track_code[:5]} Дата создание и время создания кода {self.created}'
+        return f'{self.track_code} {self.pk}'
+
+    def date_format(self):
+        return self.date.strftime('%d.%m.%Y')
 
     class Meta:
-        verbose_name = 'Трек Код'
-        verbose_name_plural = 'Трек Коды'
+        verbose_name = 'Код Заказа'
+        verbose_name_plural = 'Коды Заказов'
+

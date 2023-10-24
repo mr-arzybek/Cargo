@@ -26,7 +26,8 @@ class TrackCodeList(generics.ListAPIView):
 class TrackCodeCreate(generics.CreateAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = TrackCodeSerializer
-    queryset = models.TrackCode.objects.all()
+    queryset = TrackCode.objects.all()
+
 
 
 class TrackCodeGet(generics.RetrieveAPIView):
