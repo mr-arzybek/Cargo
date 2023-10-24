@@ -6,12 +6,6 @@ import secrets
 User = get_user_model()
 
 
-def create_jwt_pair_for_user(user: User):
-    refresh = RefreshToken.for_user(user)
-
-    tokens = {"access": str(refresh.access_token), "refresh": str(refresh)}
-
-    return tokens
 
 
 confirmation_code = random.randint(1000, 9999)

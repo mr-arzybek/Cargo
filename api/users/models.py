@@ -7,22 +7,22 @@ from django.db import models
 class UserCustomManager(BaseUserManager):
     use_in_migrations = True
 
-    def create_user(self, email, username, password=None):
-        if not email:
-            raise ValueError('The Email field must be set')
-        email = self.normalize_email(email)
-        user = self.model(email=email, username=username)
+    def create_user(self, email, password):
+        user = self.model(
+        email = self.normalize_email(email),
+                password = password,)
         user.set_password(password)
-        user.save(using=self._db)
+        user.save()
         return user
 
-    def create_superuser(self, email, username, password=None, ):
-        user = self.create_user(email, username, password)
-        user.is_staff = True
-        user.is_superuser = True
-        user.save(using=self._db)
-        return user
+    def create_superuser(self, email, password):
+        self.create_user(email,password )
+        self.user.is_staff()
+        self.user.is_superuser = True
+        self.user.save()
+        return self.user
 
+        return self.create_user(email, password, **extra_fields)
 
 class User(AbstractUser):
     password = models.CharField(max_length=150)

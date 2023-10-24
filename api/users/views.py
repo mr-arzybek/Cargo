@@ -1,8 +1,13 @@
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, login
+from rest_framework.decorators import permission_classes, api_view
 from rest_framework.permissions import AllowAny
 from rest_framework.authtoken.models import Token
+from rest_framework.renderers import JSONRenderer
+from rest_framework.throttling import UserRateThrottle
+from rest_framework.viewsets import ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
+from .models import User
 from .serializers import LoginSerializer
 from .email import EmailAuthentication
 from rest_framework import generics
@@ -12,6 +17,7 @@ from rest_framework import status, response
 from .serializers import (
     PasswordResetSearchUserSerializer, PasswordResetCodeSerializer, PasswordResetNewPasswordSerializer)
 from .service import ResetPasswordSendEmail, PasswordResetCode, PasswordResetNewPassword
+from .utils import login_user
 
 
 class PasswordResetRequestAPIView(generics.CreateAPIView):
@@ -32,6 +38,7 @@ class PasswordResetCodeAPIView(generics.CreateAPIView):
 
 class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
     serializer_class = PasswordResetNewPasswordSerializer
+
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
@@ -47,17 +54,13 @@ class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
 
 
 class LoginView(APIView):
-    authentication_classes = [EmailAuthentication]
+    queryset = User.objects.all()
+    serializer_class = LoginSerializer
     permission_classes = [AllowAny]
 
-    def post(self, request, *args, **kwargs):
-        serializer = LoginSerializer(data=request.data)
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            username = serializer.validated_data["email"]
-            password = serializer.validated_data["password"]
-            user = authenticate(username=username, password=password)
-            if user is not None:
-                token = RefreshToken.for_user(user)
-                access_token = token.access_token
-                return Response({"access": str(token) ,'refresh': str(access_token)}, status=status.HTTP_200_OK)
-            return Response({"detail": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+            return login_user(serializer)
+        else:
+            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
