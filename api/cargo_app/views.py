@@ -4,16 +4,15 @@ from rest_framework import permissions
 from rest_framework.filters import SearchFilter
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
-from rest_framework.views import APIView
-
 from api.cargo_app import serializers
+from rest_framework.views import APIView
 from api.cargo_app import models
-from api.cargo_app.models import TrackCode, Status
-from api.cargo_app.serializers import TrackCodeSerializer
+from api.cargo_app.models import TrackCode, Status, Group
+from api.cargo_app.serializers import TrackCodeSerializer , GroupSerializer
 
 from .filters import TrackCodeFilter
 
-
+    
 class TrackCodeList(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = TrackCodeSerializer
@@ -78,3 +77,10 @@ class CheckTrackCodeView(APIView):
             return Response({'status': status_tr, 'date': date_tr}, status=HTTP_200_OK)
         except TrackCode.DoesNotExist:
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
+
+
+class GroupTrackCodeApiView(generics.ListCreateAPIView , generics.RetrieveAPIView , generics.DestroyAPIView):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+

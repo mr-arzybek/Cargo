@@ -11,5 +11,5 @@ urlpatterns = [
     path('status/delete/<int:id>/', views.StatusDelete.as_view(), name='delete status'),
     path('status/list/', views.StatusList.as_view(), name='List Status'),
     path('check/trackcode/', views.CheckTrackCodeView.as_view(), name='check TrackCode'),
-
+    path('group/', views.GroupTrackCodeApiView.as_view(), name='Group')
 ]

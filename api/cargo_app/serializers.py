@@ -1,6 +1,10 @@
 from rest_framework import serializers
 
-from api.cargo_app.models import Status, TrackCode
+from api.cargo_app.models import Status, TrackCode, Group
+
+
+
+
 
 
 class StatusSerializer(serializers.ModelSerializer):
@@ -34,3 +38,11 @@ class TrackCodeSerializer(serializers.ModelSerializer):
     def get_status(self, obj):
         return f"{obj.status.name_status}"
 
+
+class GroupSerializer(serializers.ModelSerializer):
+    track_codes = TrackCodeSerializer(many=True)
+    statuses = StatusSerializer()
+
+    class Meta:
+        model = Group
+        fields = '__all__'
