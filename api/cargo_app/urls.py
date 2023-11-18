@@ -11,5 +11,8 @@ urlpatterns = [
     path('status/delete/<int:id>/', views.StatusDelete.as_view(), name='delete status'),
     path('status/list/', views.StatusList.as_view(), name='List Status'),
     path('check/trackcode/', views.CheckTrackCodeView.as_view(), name='check TrackCode'),
-    path('group/', views.GroupTrackCodeApiView.as_view(), name='Group')
+    path('group/add/trackcode/', views.GroupTrackCodeAddView.as_view(), name='Add TrackCode'),
+    path('group/delete/trackode/<int:id>/', views.GroupTrackCodeDeleteApiView.as_view(), name='Delete TrackCode'),
+    path('group/get/trackcode/<int:id>/', views.GroupTrackCodeGetApiView.as_view(), name='Get TrackCode'),
+    path('group/put/trackcode/<int:id>/', views.GroupTrackCodePutApiView.as_view(), name='Put TrackCode'),
 ]

@@ -8,11 +8,11 @@ from api.cargo_app import serializers
 from rest_framework.views import APIView
 from api.cargo_app import models
 from api.cargo_app.models import TrackCode, Status, Group
-from api.cargo_app.serializers import TrackCodeSerializer , GroupSerializer
+from api.cargo_app.serializers import TrackCodeSerializer, GroupSerializer
 
 from .filters import TrackCodeFilter
 
-    
+
 class TrackCodeList(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = TrackCodeSerializer
@@ -26,7 +26,6 @@ class TrackCodeCreate(generics.CreateAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = TrackCodeSerializer
     queryset = TrackCode.objects.all()
-
 
 
 class TrackCodeGet(generics.RetrieveAPIView):
@@ -79,8 +78,35 @@ class CheckTrackCodeView(APIView):
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
 
 
-class GroupTrackCodeApiView(generics.ListCreateAPIView , generics.RetrieveAPIView , generics.DestroyAPIView):
+# class GroupTrackCodeApiView(generics.ListCreateAPIView , generics.RetrieveAPIView , generics.DestroyAPIView):
+#     permission_classes = [permissions.IsAdminUser]
+#     queryset = Group.objects.all()
+#     serializer_class = GroupSerializer
+
+class GroupTrackCodeAddView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAdminUser]
     queryset = Group.objects.all()
     serializer_class = GroupSerializer
 
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class GroupTrackCodeDeleteApiView(generics.DestroyAPIView):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+
+
+class GroupTrackCodePutApiView(generics.UpdateAPIView):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    lookup_field = 'id'
+
+
+class GroupTrackCodeGetApiView(generics.RetrieveAPIView):
+    permission_classes = [permissions.IsAdminUser]
+    queryset = Group.objects.all()
+    serializer_class = GroupSerializer
+    lookup_field = 'id'
