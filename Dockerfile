@@ -27,5 +27,3 @@ RUN python manage.py migrate
 # Expose the port on which your application will run (change it if necessary)
 EXPOSE 8000
 
-# Start the application
-CMD ["python", "manage.py", "runserver","0.0.0.0:80"]
