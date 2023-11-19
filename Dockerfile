@@ -25,4 +25,6 @@ ENV DJANGO_SETTINGS_MODULE=core.settings.base
 EXPOSE 8000
 
 # Define the default command to run when starting the container
+# Here, we specify the IP and port to ensure the Django development server
+# is accessible from outside the Docker container
 CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
