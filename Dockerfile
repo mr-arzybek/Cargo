@@ -21,9 +21,8 @@ COPY . /app/
 # Set the DJANGO_SETTINGS_MODULE environment variable
 ENV DJANGO_SETTINGS_MODULE=core.settings.base
 
-# Run database migrations
-RUN python manage.py migrate
-
 # Expose the port on which your application will run (change it if necessary)
 EXPOSE 8000
 
+# Define the default command to run when starting the container
+CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
