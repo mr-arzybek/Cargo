@@ -28,4 +28,4 @@ RUN python manage.py migrate
 EXPOSE 8000
 
 # Start the application
-CMD ["python", "manage.py", "runserver"]
+CMD ["python", "manage.py", "runserver","0.0.0.0:80"]
