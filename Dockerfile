@@ -10,7 +10,6 @@ WORKDIR /app
 
 # Copy the requirements file into the container and install dependencies
 COPY requirements.txt /app/
-RUN pip install --upgrade pip
 RUN pip install -r requirements.txt
 
 # Copy the rest of your application code into the container
@@ -22,7 +21,11 @@ COPY . /app/
 # Set the DJANGO_SETTINGS_MODULE environment variable
 ENV DJANGO_SETTINGS_MODULE=core.settings.base
 
+# Run database migrations
+RUN python manage.py migrate
+
 # Expose the port on which your application will run (change it if necessary)
 EXPOSE 8000
 
-# Define the default
+# Start the application
+CMD ["python", "manage.py", "runserver"]
