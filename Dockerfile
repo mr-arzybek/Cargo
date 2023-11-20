@@ -12,7 +12,7 @@ WORKDIR /app
 COPY requirements.txt /app/
 RUN pip install -r requirements.txt
 
-# Copy the rest of your application code into the container
+# Copy the rest of your application code into the contner
 COPY . /app/
 
 # Install any additional dependencies if needed
@@ -27,4 +27,4 @@ EXPOSE 8000
 # Define the default command to run when starting the container
 # Here, we specify the IP and port to ensure the Django development server
 # is accessible from outside the Docker container
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
