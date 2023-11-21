@@ -7,9 +7,9 @@ from rest_framework.status import HTTP_200_OK, HTTP_404_NOT_FOUND
 from api.cargo_app import serializers
 from rest_framework.views import APIView
 from api.cargo_app import models
-from api.cargo_app.models import TrackCode, Status, Group
+from api.cargo_app.models import TrackCode, Status, GroupTrackCodes
 from api.cargo_app.serializers import TrackCodeSerializer, GroupSerializer
-
+from rest_framework import views
 from .filters import TrackCodeFilter
 
 
@@ -78,35 +78,65 @@ class CheckTrackCodeView(APIView):
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
 
 
-# class GroupTrackCodeApiView(generics.ListCreateAPIView , generics.RetrieveAPIView , generics.DestroyAPIView):
-#     permission_classes = [permissions.IsAdminUser]
-#     queryset = Group.objects.all()
-#     serializer_class = GroupSerializer
 
-class GroupTrackCodeAddView(generics.ListCreateAPIView):
+class GroupTrackCodeAddView(generics.RetrieveUpdateAPIView, generics.ListCreateAPIView):
     permission_classes = [permissions.IsAdminUser]
-    queryset = Group.objects.all()
+    queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupSerializer
+
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        track_codes = self.request.data.get('trackcodes', [])
+        group = serializer.save(user=self.request.user)
+        for code in track_codes:
+            try:
+                track_code = TrackCode.objects.get(pk=code)
+                group.track_codes.add(track_code)
+            except TrackCode.DoesNotExist:
+                pass
+            group.save()
+
+    def patch(self, request, *args, **kwargs):
+        try:
+            group = self.get_object()
+            track_codes = request.data.get('trackcodes', [])
+            for code in track_codes:
+                track_code = TrackCode.objects.get(pk=code)
+                group.track_codes.add(track_code)
+            return Response(self.serializer_class(group).data)
+        except Exception as e:
+            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
-class GroupTrackCodeDeleteApiView(generics.DestroyAPIView):
+class GroupTrackCodeDeleteApiView(views.APIView):
     permission_classes = [permissions.IsAdminUser]
-    queryset = Group.objects.all()
+    queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupSerializer
+
+    def delete(self, request, *args, **kwargs):
+        ids = request.data.get("ids", [])
+
+        if not ids:
+            return Response({"error": "No ids provided"}, status=status.HTTP_400_BAD_REQUEST)
+
+        GroupTrackCodes.objects.filter(id__in=ids).delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class GroupTrackCodePutApiView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
-    queryset = Group.objects.all()
+    queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupSerializer
     lookup_field = 'id'
 
 
-class GroupTrackCodeGetApiView(generics.RetrieveAPIView):
+class GroupTrackCodeGetApiView(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
-    queryset = Group.objects.all()
+    queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupSerializer
-    lookup_field = 'id'
