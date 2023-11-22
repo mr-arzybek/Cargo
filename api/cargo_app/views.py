@@ -77,41 +77,36 @@ class CheckTrackCodeView(APIView):
         except TrackCode.DoesNotExist:
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
 
+class TrackCodeList(AdminUserMixin, generics.ListAPIView):
+    serializer_class = TrackCodeSerializer
+    queryset = TrackCode.objects.all()
+    filter_backends = [DjangoFilterBackend, SearchFilter]
+    filterset_class = TrackCodeFilter
+    search_fields = ['track_code']
 
+# Остальные классы здесь ...
 
 class GroupTrackCodeAddView(generics.RetrieveUpdateAPIView, generics.ListCreateAPIView):
-    permission_classes = [permissions.IsAdminUser]
     queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupSerializer
+    permission_classes = [permissions.IsAdminUser]
 
     def post(self, request, *args, **kwargs):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        self.perform_create(serializer)
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+        group = serializer.save(user=request.user)
+        self._add_track_codes_to_group(group, request.data.get('trackcodes', []))
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
-    def perform_create(self, serializer):
-        track_codes = self.request.data.get('trackcodes', [])
-        group = serializer.save(user=self.request.user)
+    def _add_track_codes_to_group(self, group, track_codes):
         for code in track_codes:
             try:
                 track_code = TrackCode.objects.get(pk=code)
                 group.track_codes.add(track_code)
             except TrackCode.DoesNotExist:
-                pass
+                continue
             group.save()
 
-    def patch(self, request, *args, **kwargs):
-        try:
-            group = self.get_object()
-            track_codes = request.data.get('trackcodes', [])
-            for code in track_codes:
-                track_code = TrackCode.objects.get(pk=code)
-                group.track_codes.add(track_code)
-            return Response(self.serializer_class(group).data)
-        except Exception as e:
-            return Response({'detail': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
 class GroupTrackCodeDeleteApiView(views.APIView):

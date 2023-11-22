@@ -5,7 +5,6 @@ from .models import GroupTrackCodes, Status, TrackCode
 class GroupTrackCodeAdmin(admin.ModelAdmin):
     list_display = ('statuses',)  # Add other fields you want to display in the admin list view
     search_fields = ('statuses__name_status',)  # Add fields you want to be searchable
-    filter_horizontal = ('track_codes',)  # This is for ManyToMany fields
 
 
 class StatusAdmin(admin.ModelAdmin):

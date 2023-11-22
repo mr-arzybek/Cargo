@@ -3,7 +3,7 @@ from django.db import models
 
 class GroupTrackCodes(models.Model):
     text_trackCode = models.CharField(max_length=300)
-    track_codes = models.ManyToManyField('TrackCode', related_name='groups_track_codes', blank=True)
+    track_codes = models.ForeignKey('TrackCode', related_name='groups_track_codes', blank=True, on_delete=models.CASCADE)
     statuses = models.ForeignKey('Status', related_name='groups_statuses', on_delete=models.CASCADE)
     date_group_created = models.DateTimeField()
 
