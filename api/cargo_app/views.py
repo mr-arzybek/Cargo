@@ -1,3 +1,4 @@
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, permissions, status
 from rest_framework.filters import SearchFilter
@@ -19,12 +20,10 @@ class TrackCodeList(generics.ListAPIView):
     filterset_class = TrackCodeFilter
     search_fields = ['track_code_name']
 
-
 class TrackCodeCreate(generics.CreateAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = TrackCodeSerializer
     queryset = TrackCode.objects.all()
-
 
 class TrackCodeGet(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAdminUser]
@@ -32,13 +31,11 @@ class TrackCodeGet(generics.RetrieveAPIView):
     queryset = TrackCode.objects.all()
     lookup_field = 'id'
 
-
 class TrackCodeUpdate(generics.UpdateAPIView, generics.RetrieveAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = TrackCodeSerializer
     queryset = TrackCode.objects.all()
     lookup_field = 'id'
-
 
 class TrackCodeDelete(generics.DestroyAPIView, generics.RetrieveAPIView):
     permission_classes = [permissions.IsAdminUser]
@@ -64,13 +61,11 @@ class GroupTrackCodeAddView(generics.ListCreateAPIView):
             group.track_codes.add(track_code)
         group.save()
 
-
 class GroupTrackCodeDeleteApiView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAdminUser]
     queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupTrackCodesSerializer
     lookup_field = 'id'
-
 
 class GroupTrackCodeUpdateApiView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
@@ -78,18 +73,14 @@ class GroupTrackCodeUpdateApiView(generics.UpdateAPIView):
     serializer_class = GroupTrackCodesSerializer
     lookup_field = 'id'
 
-
 class GroupTrackCodeGetApiView(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
     queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupTrackCodesSerializer
-
-
 class StatusListCreateView(generics.ListCreateAPIView):
     queryset = Status.objects.all()
     serializer_class = serializers.StatusSerializer
     permission_classes = [permissions.IsAdminUser]
-
 
 class CheckTrackCodeView(APIView):
     def post(self, request):
@@ -105,7 +96,6 @@ class CheckTrackCodeView(APIView):
             return Response({'status': status_tr, 'date': date_tr}, status=HTTP_200_OK)
         except TrackCode.DoesNotExist:
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
-
 
 class StatusList(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAdminUser]
