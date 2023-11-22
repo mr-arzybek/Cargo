@@ -11,8 +11,13 @@ urlpatterns = [
     path('status/delete/<int:id>/', views.StatusDelete.as_view(), name='delete status'),
     path('status/list/', views.StatusList.as_view(), name='List Status'),
     path('check/trackcode/', views.CheckTrackCodeView.as_view(), name='check TrackCode'),
-    path('group/add/trackcode/', views.GroupTrackCodeAddView.as_view(), name='Add TrackCode'),
-    path('group/delete/trackode/', views.GroupTrackCodeDeleteApiView.as_view(), name='Delete TrackCode'),
-    path('group/all/', views.GroupTrackCodeGetApiView.as_view(), name='Get TrackCode'),
-    path('group/put/trackcode/', views.GroupTrackCodePutApiView.as_view(), name='Put TrackCode'),
+    path('group-track-codes/', views.GroupTrackCodeAddView.as_view(), name='group-track-code-add'),
+    path('group-track-codes/delete/<int:id>/', views.GroupTrackCodeDeleteApiView.as_view(),
+         name='group-track-code-delete'),
+    path('group-track-codes/update/<int:id>/', views.GroupTrackCodeUpdateApiView.as_view(),
+         name='group-track-code-update'),
+    path('group-track-codes/<int:id>/', views.GroupTrackCodeGetApiView.as_view(), name='group-track-code-get'),
+    path('status/create/', views.StatusListCreateView.as_view(), name='status-list-create'),
+    path('status/delete/<int:id>/', views.StatusDelete.as_view(), name='status-delete'),
+
 ]

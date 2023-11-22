@@ -1,30 +1,26 @@
 from rest_framework import serializers
+from .models import Status, TrackCode, GroupTrackCodes
 
-from api.cargo_app.models import Status, TrackCode, GroupTrackCodes
-
-
+# Serializer for the Status model
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = '__all__'
+        fields = ['id', 'name_status']
 
-
-class StatusForTrackCodeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Status
-        fields = 'name_status'
-
-
+# Serializer for the TrackCode model
 class TrackCodeSerializer(serializers.ModelSerializer):
+    group = serializers.StringRelatedField()  # Display the string representation of the group
+
     class Meta:
         model = TrackCode
-        fields = '__all__'
+        fields = ['id', 'track_code_name', 'group', 'created_at', 'updated_at']
 
-
-class GroupSerializer(serializers.ModelSerializer):
-    track_codes = TrackCodeSerializer(many=True)
-    statuses = StatusSerializer()
+# Serializer for the GroupTrackCodes model
+class GroupTrackCodesSerializer(serializers.ModelSerializer):
+    status = StatusSerializer(read_only=True)  # Nested serializer for Status
+    track_codes = TrackCodeSerializer(many=True, read_only=True)  # Nested serializer for related track codes
 
     class Meta:
         model = GroupTrackCodes
-        fields = '__all__'
+        fields = ['id', 'text_trackCode', 'status', 'date_group_created', 'group_track_code', 'track_codes']
+        extra_kwargs = {'date_group_created': {'format': '%d.%m.%Y'}}
