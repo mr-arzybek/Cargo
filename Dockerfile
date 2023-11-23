@@ -16,7 +16,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 COPY . .
 
 # Выполните миграции и сбор статических файлов
-RUN python manage.py makemigrations
+
 RUN python manage.py migrate
 
 
