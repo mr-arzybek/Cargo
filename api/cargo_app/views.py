@@ -67,6 +67,7 @@ class GroupTrackCodeDeleteApiView(generics.DestroyAPIView):
     serializer_class = GroupTrackCodesSerializer
     lookup_field = 'id'
 
+
 class GroupTrackCodeUpdateApiView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
     queryset = GroupTrackCodes.objects.all()

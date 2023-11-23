@@ -18,7 +18,7 @@ class TrackCodeSerializer(serializers.ModelSerializer):
 # Serializer for the GroupTrackCodes model
 class GroupTrackCodesSerializer(serializers.ModelSerializer):
     status = StatusSerializer(read_only=True)  # Nested serializer for Status
-    track_codes = TrackCodeSerializer(many=True, read_only=True)  # Nested serializer for related track codes
+    group_track_code = TrackCodeSerializer(many=True, read_only=True)  # Nested serializer for related track codes
 
     class Meta:
         model = GroupTrackCodes

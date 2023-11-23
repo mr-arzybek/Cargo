@@ -37,9 +37,6 @@ class GroupTrackCodes(models.Model):
     def date_format(self):
         return self.date_group_created.strftime('%d.%m.%Y')
 
-    def __str__(self):
-        track_codes_str = ', '.join([track_code.track_code_name for track_code in self.track_codes.all()])
-        return f'{self.status.name_status} and {track_codes_str}'
 
     class Meta:
         verbose_name = 'Группу Трек-кодов'
