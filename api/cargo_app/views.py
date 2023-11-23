@@ -63,7 +63,7 @@ class GroupTrackCodeAddView(generics.ListCreateAPIView):
 
 class GroupTrackCodeDeleteApiView(generics.DestroyAPIView):
     permission_classes = [permissions.IsAdminUser]
-    queryset = GroupTrackCodes.objects.all()
+    queryset = TrackCode.objects.all()
     serializer_class = GroupTrackCodesSerializer
     lookup_field = 'id'
 
@@ -72,6 +72,7 @@ class GroupTrackCodeUpdateApiView(generics.UpdateAPIView):
     queryset = GroupTrackCodes.objects.all()
     serializer_class = GroupTrackCodesSerializer
     lookup_field = 'id'
+
 
 class GroupTrackCodeGetApiView(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
