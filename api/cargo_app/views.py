@@ -78,6 +78,12 @@ class CheckTrackCodeView(APIView):
             return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
 
 
+class GroupCreateApiView(generics.ListCreateAPIView):
+    queryset = Group.objects.all()
+    serializer_class = serializers.GroupCreateSerializer
+
+
+
 class GroupTrackCodeDelete(APIView):
     """
     API для удаления группы объектов по списку их идентификаторов.

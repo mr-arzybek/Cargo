@@ -3,7 +3,7 @@ from django.db import models
 
 class Group(models.Model):
     track_codes = models.ManyToManyField('TrackCode', related_name='groups', blank=True)
-    statuses = models.ForeignKey('Status', related_name='groups', on_delete=models.CASCADE)
+    status = models.ForeignKey('Status', related_name='groups', on_delete=models.CASCADE)
 
     def __str__(self):
         return f'{self.statuses.name_status}'

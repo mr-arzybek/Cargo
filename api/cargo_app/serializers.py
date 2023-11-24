@@ -41,7 +41,7 @@ class TrackCodeSerializer(serializers.ModelSerializer):
 
 class GroupSerializer(serializers.ModelSerializer):
     track_codes = TrackCodeSerializer(many=True)
-    statuses = StatusSerializer()
+    status = StatusSerializer()
 
     class Meta:
         model = Group
@@ -60,3 +60,7 @@ class GroupGetSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class GroupCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = Group
