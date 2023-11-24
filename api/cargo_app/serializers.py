@@ -1,26 +1,62 @@
 from rest_framework import serializers
-from .models import Status, TrackCode, GroupTrackCodes
 
-# Serializer for the Status model
+from api.cargo_app.models import Status, TrackCode, Group
+
+
+
+
+
+
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ['id', 'name_status']
+        fields = '__all__'
 
-# Serializer for the TrackCode model
+
+class StatusForTrackCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Status
+        fields = 'name_status'
+
+
 class TrackCodeSerializer(serializers.ModelSerializer):
-    group = serializers.StringRelatedField()  # Display the string representation of the group
+    status_id = serializers.IntegerField(write_only=True, required=True)
+    status = serializers.SerializerMethodField()
 
     class Meta:
         model = TrackCode
-        fields = ['id', 'track_code_name', 'group', 'created_at', 'updated_at']
+        fields = '__all__'
 
-# Serializer for the GroupTrackCodes model
-class GroupTrackCodesSerializer(serializers.ModelSerializer):
-    status = StatusSerializer(read_only=True)  # Nested serializer for Status
-    group_track_code = TrackCodeSerializer(many=True, read_only=True)  # Nested serializer for related track codes
+    def create(self, validated_data):
+        status_id = validated_data.pop('status_id')
+        status = Status.objects.get(id=status_id)
+        track_code = validated_data['track_code']
+        date = validated_data['date']
+        track_code_instance = TrackCode.objects.create(track_code=track_code, status=status, date=date)
+        return track_code_instance
+
+    def get_status(self, obj):
+        return f"{obj.status.name_status}"
+
+
+class GroupSerializer(serializers.ModelSerializer):
+    track_codes = TrackCodeSerializer(many=True)
+    statuses = StatusSerializer()
 
     class Meta:
-        model = GroupTrackCodes
-        fields = ['id', 'text_trackCode', 'status', 'date_group_created', 'group_track_code', 'track_codes']
-        extra_kwargs = {'date_group_created': {'format': '%d.%m.%Y'}}
+        model = Group
+        fields = '__all__'
+
+
+class GroupListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+
+class GroupGetSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+
