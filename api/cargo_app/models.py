@@ -2,13 +2,17 @@ from django.db import models
 
 
 class Group(models.Model):
+    name_group = models.CharField(max_length=300)
     track_codes = models.ManyToManyField('TrackCode', related_name='groups', blank=True)
     status = models.ForeignKey('Status', related_name='groups', on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    track_code = models.CharField(max_length=500, blank=True, null=True)
 
     def __str__(self):
-        return f'{self.statuses.name_status}'
+        return f'{self.status.name_status}'
 
-
+    def date_format(self):
+        return self.date.strftime('%Y-%m-%d')
     class Meta:
         verbose_name = 'Группу Трек-кодов'
         verbose_name_plural = ('Группы Трек-кодов')
@@ -25,9 +29,8 @@ class Status(models.Model):
 
 
 class TrackCode(models.Model):
+    group = models.ForeignKey(Group, on_delete=models.CASCADE, related_name='groups')
     track_code = models.CharField(max_length=200, unique=True)
-    status = models.ForeignKey(Status, on_delete=models.CASCADE, null=True, blank=True)
-    date = models.DateField()
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

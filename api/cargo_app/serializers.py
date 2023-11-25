@@ -20,27 +20,13 @@ class StatusForTrackCodeSerializer(serializers.ModelSerializer):
 
 
 class TrackCodeSerializer(serializers.ModelSerializer):
-    status_id = serializers.IntegerField(write_only=True, required=True)
-    status = serializers.SerializerMethodField()
 
     class Meta:
         model = TrackCode
         fields = '__all__'
 
-    def create(self, validated_data):
-        status_id = validated_data.pop('status_id')
-        status = Status.objects.get(id=status_id)
-        track_code = validated_data['track_code']
-        date = validated_data['date']
-        track_code_instance = TrackCode.objects.create(track_code=track_code, status=status, date=date)
-        return track_code_instance
-
-    def get_status(self, obj):
-        return f"{obj.status.name_status}"
-
-
 class GroupSerializer(serializers.ModelSerializer):
-    track_codes = TrackCodeSerializer(many=True)
+    track_codes = TrackCodeSerializer(many=True, read_only=True)
     status = StatusSerializer()
 
     class Meta:
@@ -49,12 +35,17 @@ class GroupSerializer(serializers.ModelSerializer):
 
 
 class GroupListSerializer(serializers.ModelSerializer):
+    track_codes = TrackCodeSerializer(many=True)
+    track_code = TrackCodeSerializer(many=True, read_only=True)
     class Meta:
         model = Group
         fields = '__all__'
 
 
+
+
 class GroupGetSerializer(serializers.ModelSerializer):
+    track_codes = TrackCodeSerializer(many=True, read_only=True)
     class Meta:
         model = Group
         fields = '__all__'

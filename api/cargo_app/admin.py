@@ -14,9 +14,9 @@ class StatusAdmin(admin.ModelAdmin):
 
 
 class TrackCodeAdmin(admin.ModelAdmin):
-    list_display = ('track_code', 'pk', 'status', 'date', 'date_format', 'created_at', 'updated_at')
-    search_fields = ('track_code', 'status__name_status')
-    list_filter = ('status', 'date')  # Filter by status and date
+    list_display = ('track_code', 'pk', 'created_at', 'updated_at')
+    search_fields = ('track_code',)
+    list_filter = ('track_code',)  # Filter by status and date
 
 
 # Register your models here.

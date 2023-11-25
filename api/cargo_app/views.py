@@ -10,7 +10,7 @@ from api.cargo_app import models
 from api.cargo_app.models import TrackCode, Status, Group
 from api.cargo_app import serializers
 
-from .filters import TrackCodeFilter
+
 
 
 class TrackCodeList(generics.ListAPIView):
@@ -18,7 +18,6 @@ class TrackCodeList(generics.ListAPIView):
     serializer_class = serializers.TrackCodeSerializer
     queryset = TrackCode.objects.all()
     filter_backends = [DjangoFilterBackend, SearchFilter]
-    filterset_class = TrackCodeFilter
     search_fields = ['track_code']
 
 
