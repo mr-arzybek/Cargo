@@ -14,8 +14,8 @@ urlpatterns = [
     path('group/trackcode/delete/', views.GroupTrackCodeDelete.as_view(), name='delete trackcode from group'),
     path('group/list/', views.GroupListApiView.as_view(), name='List Group'),
     path('group/create/', views.GroupCreateApiView.as_view(), name='create Group'),
-    path('group/delete/', views.GroupUpdateApiView.as_view(), name='update Group'),
+    path('group/delete/', views.GroupTrackCodeDelete.as_view(), name='update Group'),
     path('group/get/<int:id>/', views.GroupGet.as_view(), name='get Group'),
-    path('group/update/<int:id>/', views.GroupUpdate.as_view(), name='update Group'),
+    path('group/redirect/', views.BulkMoveTrackCodeView.as_view(), name='bulk-move-track-code')
 
 ]
