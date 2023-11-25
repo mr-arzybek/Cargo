@@ -43,6 +43,11 @@ class GroupListSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 
+class GroupUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = '__all__'
+
 class GroupGetSerializer(serializers.ModelSerializer):
     track_codes = TrackCodeSerializer(many=True, read_only=True)
 
