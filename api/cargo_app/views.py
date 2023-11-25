@@ -11,8 +11,6 @@ from api.cargo_app.models import TrackCode, Status, Group
 from api.cargo_app import serializers
 
 
-
-
 class TrackCodeList(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = serializers.TrackCodeSerializer
@@ -82,7 +80,6 @@ class GroupCreateApiView(generics.ListCreateAPIView):
     serializer_class = serializers.GroupCreateSerializer
 
 
-
 class GroupTrackCodeDelete(APIView):
 
     def delete(self, request, *args, **kwargs):
@@ -149,39 +146,51 @@ class GroupGet(generics.RetrieveAPIView):
     queryset = Group.objects.all()
     serializer_class = serializers.GroupGetSerializer
     lookup_field = 'id'
-
-
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
-from .models import TrackCode, Group
+from .models import Group, TrackCode
 from . import serializers
+import json
 
 class BulkMoveTrackCodeView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = serializers.TrackCodeSerializer
 
     def update(self, request, *args, **kwargs):
+        # Extract and validate the track code IDs and new group ID from the request
         track_code_ids = request.data.get('track_code_ids')
         new_group_id = request.data.get('new_group_id')
 
-        # Validate input
+        # Check if track_code_ids is a string and try to parse it as JSON
+        if isinstance(track_code_ids, str):
+            try:
+                track_code_ids = json.loads(track_code_ids)
+            except json.JSONDecodeError:
+                return Response({'error': 'Invalid format for track_code_ids'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Validate the track code IDs
         if not track_code_ids:
             return Response({'error': 'No track codes provided'}, status=status.HTTP_400_BAD_REQUEST)
 
         if not isinstance(track_code_ids, list) or not all(isinstance(id, int) for id in track_code_ids):
             return Response({'error': 'track_code_ids must be a list of integers'}, status=status.HTTP_400_BAD_REQUEST)
 
-        if not isinstance(new_group_id, int):
+        # Validate the new group ID
+        try:
+            new_group_id = int(new_group_id)
+        except ValueError:
             return Response({'error': 'new_group_id must be an integer'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # Retrieve new group
+        # Retrieve and validate the new group
         try:
             new_group = Group.objects.get(id=new_group_id)
         except Group.DoesNotExist:
             return Response({'error': 'New group not found'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Process track codes
+        # Initialize a list for not found track code IDs
         not_found_ids = []
+
+        # Update each track code's group if it exists
         for track_code_id in track_code_ids:
             try:
                 track_code = TrackCode.objects.get(id=track_code_id)
@@ -190,8 +199,8 @@ class BulkMoveTrackCodeView(generics.UpdateAPIView):
             except TrackCode.DoesNotExist:
                 not_found_ids.append(track_code_id)
 
-        # Construct response
+        # Add a response for track codes that were not found
         if not_found_ids:
-            return Response({'error': 'Some track codes not found', 'not_found_ids': not_found_ids}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'not_found_ids': not_found_ids}, status=status.HTTP_404_NOT_FOUND)
 
-        return Response({'message': 'Track codes moved successfully'}, status=status.HTTP_200_OK)
+        return Response({'message': 'Track codes successfully updated'}, status=status.HTTP_200_OK)
