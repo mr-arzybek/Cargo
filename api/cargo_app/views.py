@@ -1,3 +1,5 @@
+import json
+
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import generics, status
 from rest_framework import permissions
@@ -131,6 +133,7 @@ class GroupUpdateApiView(generics.UpdateAPIView):
     queryset = Group.objects.all()
     serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAdminUser]
+    lookup_field = 'id'
 
 
 class GroupGet(generics.RetrieveAPIView):
@@ -139,12 +142,6 @@ class GroupGet(generics.RetrieveAPIView):
     serializer_class = serializers.GroupGetSerializer
     lookup_field = 'id'
 
-
-from rest_framework import generics, permissions, status
-from rest_framework.response import Response
-from .models import Group, TrackCode
-from . import serializers
-import json
 
 
 class BulkMoveTrackCodeView(generics.UpdateAPIView):
