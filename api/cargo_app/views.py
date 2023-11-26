@@ -9,8 +9,42 @@ from rest_framework.views import APIView
 from api.cargo_app import models
 from api.cargo_app.models import TrackCode, Status, Group
 from api.cargo_app import serializers
+from django.shortcuts import get_object_or_404
+from django.http import JsonResponse
 
+class DeleteTrackCodesFromGroup(APIView):
 
+    def post(self, request, *args, **kwargs):
+        group_id = request.data.get('group_id')
+        track_code_ids = request.data.get('track_code_ids', [])
+
+        # Make sure group_id is provided and valid
+        if not group_id:
+            return JsonResponse({'error': 'No group ID provided.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Make sure track_code_ids is a list of integers
+        try:
+            track_code_ids = [int(id) for id in track_code_ids]
+        except (ValueError, TypeError):
+            return JsonResponse({'error': 'track_code_ids must be a list of integers.'}, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            group = Group.objects.get(id=group_id)
+        except Group.DoesNotExist:
+            return JsonResponse({'error': 'Group not found.'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Filter track codes that exist and are part of the group
+        existing_track_codes = TrackCode.objects.filter(id__in=track_code_ids, group=group)
+
+        # Delete the track codes
+        deleted_count, _ = existing_track_codes.delete()
+
+        if deleted_count < len(track_code_ids):
+            message = f'Some track codes were not found in the specified group and skipped. {deleted_count} track codes deleted from the group.'
+        else:
+            message = 'All provided track codes in the specified group were successfully deleted.'
+
+        return JsonResponse({'message': message}, status=status.HTTP_200_OK)
 class TrackCodeList(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
     serializer_class = serializers.TrackCodeSerializer
@@ -82,24 +116,30 @@ class GroupCreateApiView(generics.ListCreateAPIView):
 
 class GroupTrackCodeDelete(APIView):
     def delete(self, request, *args, **kwargs):
-        ids = request.data.get('ids', [])
+        track_code_ids = request.data.get('track_code_ids', [])
 
-        # Проверяем, что ids - это список
-        if not isinstance(ids, list):
-            return Response({'error': 'Неверный формат данных. Ожидается список идентификаторов.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        # Удаляем объекты, соответствующие идентификаторам
-        for id in ids:
+        # Проверяем, является ли track_code_ids строкой и пытаемся ее десериализовать
+        if isinstance(track_code_ids, str):
             try:
-                obj = TrackCode.objects.get(id=id)
-                obj.delete()
-            except TrackCode.DoesNotExist:
-                # Возвращаем ошибку, если объект не найден
-                return Response({'error': f'Объект с идентификатором {id} не найден.'},
-                                status=status.HTTP_404_NOT_FOUND)
+                track_code_ids = json.loads(track_code_ids)
+            except json.JSONDecodeError:
+                return Response({'error': 'Invalid format for track_code_ids'}, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response({'message': 'Объекты успешно удалены.'}, status=status.HTTP_200_OK)
+        # Получаем список объектов для удаления
+        objects_to_delete = TrackCode.objects.filter(id__in=track_code_ids)
+        found_ids = [obj.id for obj in objects_to_delete]
+        missing_ids = list(set(track_code_ids) - set(found_ids))
+
+        if missing_ids:
+            # Удаляем найденные объекты
+            objects_to_delete.delete()
+            return Response({
+                                'warning': f'Некоторые объекты с идентификаторами {missing_ids} не найдены. Остальные объекты удалены.'},
+                            status=status.HTTP_200_OK)
+
+        # Удаляем все найденные объекты, если нет отсутствующих ID
+        objects_to_delete.delete()
+        return Response({'message': 'Все объекты успешно удалены.'}, status=status.HTTP_200_OK)
 
 
 class GroupListApiView(generics.ListAPIView):
