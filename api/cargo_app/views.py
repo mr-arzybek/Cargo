@@ -114,32 +114,11 @@ class GroupCreateApiView(generics.ListCreateAPIView):
     serializer_class = serializers.GroupCreateSerializer
 
 
-class GroupTrackCodeDelete(APIView):
-    def delete(self, request, *args, **kwargs):
-        track_code_ids = request.data.get('track_code_ids', [])
-
-        # Проверяем, является ли track_code_ids строкой и пытаемся ее десериализовать
-        if isinstance(track_code_ids, str):
-            try:
-                track_code_ids = json.loads(track_code_ids)
-            except json.JSONDecodeError:
-                return Response({'error': 'Invalid format for track_code_ids'}, status=status.HTTP_400_BAD_REQUEST)
-
-        # Получаем список объектов для удаления
-        objects_to_delete = TrackCode.objects.filter(id__in=track_code_ids)
-        found_ids = [obj.id for obj in objects_to_delete]
-        missing_ids = list(set(track_code_ids) - set(found_ids))
-
-        if missing_ids:
-            # Удаляем найденные объекты
-            objects_to_delete.delete()
-            return Response({
-                                'warning': f'Некоторые объекты с идентификаторами {missing_ids} не найдены. Остальные объекты удалены.'},
-                            status=status.HTTP_200_OK)
-
-        # Удаляем все найденные объекты, если нет отсутствующих ID
-        objects_to_delete.delete()
-        return Response({'message': 'Все объекты успешно удалены.'}, status=status.HTTP_200_OK)
+class GroupDeleteApiView(generics.DestroyAPIView):
+    queryset = Group.objects.all()
+    serializer_class = serializers.GroupSerializer
+    permission_classes = [permissions.IsAdminUser]
+    lookup_field = 'id'
 
 
 class GroupListApiView(generics.ListAPIView):
