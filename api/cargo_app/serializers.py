@@ -37,10 +37,14 @@ class GroupTrackCodeNameSerializer(serializers.ModelSerializer):
 
 class GroupListSerializer(serializers.ModelSerializer):
     track_codes = TrackCodeSerializer(many=True, read_only=True)
+    status_name = serializers.SerializerMethodField()
 
     class Meta:
         model = Group
         fields = '__all__'
+
+    def get_status_name(self, obj):
+        return obj.status.name_status
 
 
 class GroupUpdateSerializer(serializers.ModelSerializer):
