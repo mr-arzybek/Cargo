@@ -67,12 +67,12 @@ class CheckTrackCodeView(APIView):
             return Response({'error': 'Пожалуйста, предоставьте код'}, status=status.HTTP_400_BAD_REQUEST)
 
         try:
-            track_code = TrackCode.objects.get(track_code=track_code)
-            status_tr = str(track_code.status.name_status)
-            date_tr = str(track_code.date)
-            return Response({'status': status_tr, 'date': date_tr}, status=HTTP_200_OK)
+            track_code_obj = TrackCode.objects.get(track_code=track_code)
+            group_status = str(track_code_obj.group.status)
+            group_date = str(track_code_obj.group.date)
+            return Response({'status': group_status, 'date': group_date}, status=status.HTTP_200_OK)
         except TrackCode.DoesNotExist:
-            return Response({'error': 'Код не найден'}, status=HTTP_404_NOT_FOUND)
+            return Response({'error': 'Код не найден'}, status=status.HTTP_404_NOT_FOUND)
 
 
 class GroupCreateApiView(generics.ListCreateAPIView):
@@ -81,7 +81,6 @@ class GroupCreateApiView(generics.ListCreateAPIView):
 
 
 class GroupTrackCodeDelete(APIView):
-
     def delete(self, request, *args, **kwargs):
         ids = request.data.get('ids', [])
 
@@ -146,11 +145,14 @@ class GroupGet(generics.RetrieveAPIView):
     queryset = Group.objects.all()
     serializer_class = serializers.GroupGetSerializer
     lookup_field = 'id'
+
+
 from rest_framework import generics, permissions, status
 from rest_framework.response import Response
 from .models import Group, TrackCode
 from . import serializers
 import json
+
 
 class BulkMoveTrackCodeView(generics.UpdateAPIView):
     permission_classes = [permissions.IsAdminUser]
