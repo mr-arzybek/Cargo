@@ -132,32 +132,6 @@ class GroupUpdateApiView(generics.UpdateAPIView):
     serializer_class = serializers.GroupSerializer
     permission_classes = [permissions.IsAdminUser]
 
-    def update(self, request, *args, **kwargs):
-        data = request.data
-        if not isinstance(data, list):
-            return Response({'error': 'Неверный формат данных. Ожидается список объектов.'},
-                            status=status.HTTP_400_BAD_REQUEST)
-
-        updated_objects = []
-        for item in data:
-            try:
-                # Получаем объект по идентификатору
-                obj = Group.objects.get(id=item.get('id'))
-
-                # Обновляем объект с помощью сериализатора
-                serializer = self.get_serializer(obj, data=item, partial=True)
-                if serializer.is_valid():
-                    serializer.save()
-                    updated_objects.append(serializer.data)
-                else:
-                    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-            except Group.DoesNotExist:
-                return Response({'error': f'Объект с идентификатором {item.get("id")} не найден.'},
-                                status=status.HTTP_404_NOT_FOUND)
-
-        return Response(updated_objects, status=status.HTTP_200_OK)
-
 
 class GroupGet(generics.RetrieveAPIView):
     permission_classes = [permissions.IsAdminUser]
