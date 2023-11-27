@@ -15,7 +15,6 @@ from django.shortcuts import get_object_or_404
 from django.http import JsonResponse
 
 class DeleteTrackCodesFromGroup(APIView):
-
     def post(self, request, *args, **kwargs):
         group_id = request.data.get('group_id')
         track_code_ids = request.data.get('track_code_ids', [])
@@ -45,7 +44,6 @@ class DeleteTrackCodesFromGroup(APIView):
             message = f'Some track codes were not found in the specified group and skipped. {deleted_count} track codes deleted from the group.'
         else:
             message = 'All provided track codes in the specified group were successfully deleted.'
-
         return JsonResponse({'message': message}, status=status.HTTP_200_OK)
 class TrackCodeList(generics.ListAPIView):
     permission_classes = [permissions.IsAdminUser]
@@ -104,7 +102,7 @@ class CheckTrackCodeView(APIView):
 
         try:
             track_code_obj = TrackCode.objects.get(track_code=track_code)
-            group_status = str(track_code_obj.group.status)
+            group_status = str(track_code_obj.group.status.name_status)
             group_date = str(track_code_obj.group.date)
             return Response({'status': group_status, 'date': group_date}, status=status.HTTP_200_OK)
         except TrackCode.DoesNotExist:
