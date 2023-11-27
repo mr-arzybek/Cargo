@@ -60,6 +60,10 @@ class LoginView(APIView):
         if serializer.is_valid():
             user = serializer.validated_data
             login(request, user)  # Используем встроенный метод login для начала сессии пользователя
-            return Response({"message": "Login successful"}, status=status.HTTP_200_OK)
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+            }, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)
