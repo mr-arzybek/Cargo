@@ -129,10 +129,10 @@ class GroupListApiView(generics.ListAPIView):
     serializer_class = serializers.GroupListSerializer
 
 
-class GroupUpdateApiView(generics.UpdateAPIView):
+class GroupUpdateApiView(generics.UpdateAPIView,generics.RetrieveAPIView):
     queryset = Group.objects.all()
-    serializer_class = serializers.GroupSerializer
-    permission_classes = [permissions.IsAdminUser]
+    serializer_class = serializers.GroupUpdateSerializer
+    # permission_classes = [permissions.IsAdminUser]
     lookup_field = 'id'
 
 
