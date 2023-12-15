@@ -1,10 +1,19 @@
-version: '2'
+version: '3'
 
 services:
-  web:
-    build: .
-    command: python manage.py runserver 0.0.0.0:123
-    volumes:
-      - .:/usr/src/app
+  backend:
+    build:
+      context: .
+    container_name: cargo_dorabotki
+    environment:
+      - DJANGO_SUPERUSER_EMAIL=${DJANGO_SUPERUSER_EMAIL}
+      - DJANGO_SUPERUSER_USERNAME=${DJANGO_SUPERUSER_USERNAME}
+      - DJANGO_SUPERUSER_PASSWORD=${DJANGO_SUPERUSER_PASSWORD}
+    command: >
+      sh -c "
+      python manage.py makemigrations &&
+      python manage.py migrate &&
+      python manage.py createsuperuser --noinput &&
+      python manage.py runserver 0.0.0.0:86"
     ports:
-      - "122:123"
+      - "86:86"

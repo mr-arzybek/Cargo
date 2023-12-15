@@ -1,24 +1,12 @@
-# Используйте официальный образ Python как базовый
-FROM python:3.10
+FROM python:3.11
 
-# Установите рабочий каталог в контейнере
-WORKDIR /usr/src/app
+ENV PYTHONWRITEBYTECODE 1
+ENV PYTHONBUFFERED 1
 
-# Установите переменные среды
-ENV PYTHONDONTWRITEBYTECODE 1
-ENV PYTHONUNBUFFERED 1
+WORKDIR /app
 
-# Установите зависимости
-COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+COPY requirements.txt /app
 
-# Копируйте проект в контейнер
-COPY . .
+RUN pip install -r /app/requirements.txt
 
-# Выполните миграции и сбор статических файлов
-
-RUN python manage.py migrate
-
-
-# Укажите команду для запуска сервера
-CMD ["python", "manage.py", "runserver", "0.0.0.0:123"]
+COPY . /app
