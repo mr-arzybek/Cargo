@@ -1,5 +1,5 @@
 # Используйте официальный образ Python как базовый
-FROM python:3.9
+FROM python:3.10
 
 # Установите рабочий каталог в контейнере
 WORKDIR /usr/src/app
@@ -21,4 +21,4 @@ RUN python manage.py migrate
 
 
 # Укажите команду для запуска сервера
-CMD ["python", "manage.py", "runserver", "0.0.0.0:80"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:123"]
