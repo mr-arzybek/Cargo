@@ -1,5 +1,5 @@
 from rest_framework import serializers
-
+from django.contrib.auth import authenticate
 
 class PasswordResetNewPasswordSerializer(serializers.Serializer):
     password = serializers.CharField(
@@ -17,19 +17,14 @@ class PasswordResetSearchUserSerializer(serializers.Serializer):
     class Meta:
         fields = ['email']
 
-
 class LoginSerializer(serializers.Serializer):
     email = serializers.EmailField()
     password = serializers.CharField()
 
-    def create(self, validated_data):
-        password = validated_data.pop('password', None)
-        instance = self.Meta.model(**validated_data)
-
-        # Adding the below line made it work for me.
-        instance.is_active = True
-        if password is not None:
-            # Set password does the hash, so you don't need to call make_password
-            instance.set_password(password)
-        instance.save()
-        return instance
+    def validate(self, data):
+        # Проверяем соответствие логина и пароля
+        user = authenticate(username=data['email'], password=data['password'])
+        if user and user.is_active:
+            return user
+        else:
+            raise serializers.ValidationError("Invalid email or password.")

@@ -52,15 +52,18 @@ class PasswordResetNewPasswordAPIView(generics.CreateAPIView):
         else:
             return response.Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
 class LoginView(APIView):
-    queryset = User.objects.all()
-    serializer_class = LoginSerializer
     permission_classes = [AllowAny]
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            return login_user(serializer)
+            user = serializer.validated_data
+            login(request, user)  # Используем встроенный метод login для начала сессии пользователя
+            refresh = RefreshToken.for_user(user)
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+            }, status=status.HTTP_200_OK)
         else:
-            return Response(data=serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+            return Response(serializer.errors, status=status.HTTP_401_UNAUTHORIZED)

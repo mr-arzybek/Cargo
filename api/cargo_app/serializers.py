@@ -1,26 +1,66 @@
 from rest_framework import serializers
-from .models import Status, TrackCode, GroupTrackCodes
 
-# Serializer for the Status model
+from api.cargo_app.models import Status, TrackCode, Group
+
+
 class StatusSerializer(serializers.ModelSerializer):
     class Meta:
         model = Status
-        fields = ['id', 'name_status']
+        fields = '__all__'
 
-# Serializer for the TrackCode model
+
+class StatusForTrackCodeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Status
+        fields = 'name_status'
+
+
 class TrackCodeSerializer(serializers.ModelSerializer):
-    group = serializers.StringRelatedField()  # Display the string representation of the group
-
     class Meta:
         model = TrackCode
-        fields = ['id', 'track_code_name', 'group', 'created_at', 'updated_at']
+        fields = '__all__'
 
-# Serializer for the GroupTrackCodes model
-class GroupTrackCodesSerializer(serializers.ModelSerializer):
-    status = StatusSerializer(read_only=True)  # Nested serializer for Status
-    group_track_code = TrackCodeSerializer(many=True, read_only=True)  # Nested serializer for related track codes
+
+class GroupSerializer(serializers.ModelSerializer):
+    track_codes = TrackCodeSerializer(many=True, read_only=True)
+    status = StatusSerializer()
 
     class Meta:
-        model = GroupTrackCodes
-        fields = ['id', 'text_trackCode', 'status', 'date_group_created', 'group_track_code', 'track_codes']
-        extra_kwargs = {'date_group_created': {'format': '%d.%m.%Y'}}
+        model = Group
+        fields = '__all__'
+
+
+class GroupTrackCodeNameSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TrackCode
+        fields = 'track_code'.split()
+
+class GroupListSerializer(serializers.ModelSerializer):
+    track_codes = TrackCodeSerializer(many=True, read_only=True)
+    status_name = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+    def get_status_name(self, obj):
+        return obj.status.name_status
+
+
+class GroupUpdateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+class GroupGetSerializer(serializers.ModelSerializer):
+    track_codes = TrackCodeSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Group
+        fields = '__all__'
+
+
+class GroupCreateSerializer(serializers.ModelSerializer):
+    class Meta:
+        fields = '__all__'
+        model = Group
