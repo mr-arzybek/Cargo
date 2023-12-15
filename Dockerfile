@@ -21,4 +21,4 @@ RUN python manage.py migrate
 
 
 # Укажите команду для запуска сервера
-CMD ["python", "manage.py", "runserver", "0.0.0.0:800"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]

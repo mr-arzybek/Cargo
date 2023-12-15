@@ -3,8 +3,8 @@ version: '2'
 services:
   web:
     build: .
-    command: python manage.py runserver 0.0.0.0:800
+    command: python manage.py runserver 0.0.0.0:8000
     volumes:
       - .:/usr/src/app
     ports:
-      - "700:800"
+      - "7000:8000"
